@@ -32,9 +32,10 @@ export const generateFinancialInsight = async (financialData: string) => {
         const result = await model.generateContent(prompt);
         const response = await result.response;
         return response.text();
-    } catch (error) {
+    } catch (error: any) {
         console.error("Erro ao gerar insight do Gemini:", error);
-        return "Não foi possível gerar insights agora. Verifique sua conexão e chave de API.";
+        const errorMsg = error?.message || "Erro desconhecido";
+        return `Não foi possível gerar insights agora. Erro: ${errorMsg}. Verifique sua conexão e chave de API.`;
     }
 };
 
