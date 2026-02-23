@@ -8,7 +8,8 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey || "");
 
-export const getGeminiModel = (modelName: string = "gemini-1.5-flash") => {
+// Usando gemini-pro como alternativa estável se o flash 1.5 der 404
+export const getGeminiModel = (modelName: string = "gemini-pro") => {
     return genAI.getGenerativeModel({ model: modelName });
 };
 
