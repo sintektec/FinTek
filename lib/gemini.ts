@@ -8,8 +8,8 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey || "");
 
-// Usando gemini-pro como alternativa estável se o flash 1.5 der 404
-export const getGeminiModel = (modelName: string = "gemini-pro") => {
+// Usando gemini-2.5-flash, pois as novas chaves do AI Studio usam esta versão por padrão
+export const getGeminiModel = (modelName: string = "gemini-2.5-flash") => {
     return genAI.getGenerativeModel({ model: modelName });
 };
 
