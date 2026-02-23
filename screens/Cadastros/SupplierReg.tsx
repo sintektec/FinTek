@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { validateCNPJ, formatCNPJ, validateCPF, formatCPF, formatDocument, formatPhone } from '../../utils/helpers';
+import { validateCNPJ, formatCNPJ, validateCPF, formatCPF, formatDocument, formatCEP, formatPhone } from '../../utils/helpers';
 import { User } from '../../types';
 import {
   Plus,
