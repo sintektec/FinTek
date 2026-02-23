@@ -412,15 +412,6 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
                         placeholder="00000-000"
                       />
                     </div>
-                    <div className="md:col-span-12 space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Complemento</label>
-                      <input
-                        value={formData.complemento}
-                        onChange={(e) => setFormData(prev => ({ ...prev, complemento: e.target.value }))}
-                        className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
-                        placeholder="Apto, Bloco, Sala..."
-                      />
-                    </div>
                     <div className="md:col-span-9 space-y-2">
                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Logradouro</label>
                       <input
@@ -437,6 +428,15 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
                         onChange={(e) => setFormData(prev => ({ ...prev, numero: e.target.value }))}
                         className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
                         placeholder="123"
+                      />
+                    </div>
+                    <div className="md:col-span-12 space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Complemento</label>
+                      <input
+                        value={formData.complemento}
+                        onChange={(e) => setFormData(prev => ({ ...prev, complemento: e.target.value }))}
+                        className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
+                        placeholder="Apto, Bloco, Sala..."
                       />
                     </div>
                     <div className="md:col-span-5 space-y-2">
