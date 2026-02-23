@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { validateCNPJ, formatDocument, validateCPF } from '../../utils/helpers';
+import { validateCNPJ, formatDocument, validateCPF, formatCEP } from '../../utils/helpers';
 import { User, Company } from '../../types';
 import { supabase } from '../../lib/supabase';
-import { Edit3, Trash2, PlusCircle, Building2, Search, X, Users, UserPlus, Trash } from 'lucide-react';
+import { Edit3, Trash2, PlusCircle, Building2, Search, X, Users, UserPlus, Trash, MapPin } from 'lucide-react';
 
 const CompanyReg: React.FC<{ user: User }> = ({ user }) => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,14 @@ const CompanyReg: React.FC<{ user: User }> = ({ user }) => {
     cnpj: '',
     razaoSocial: '',
     nomeFantasia: '',
-    email: ''
+    email: '',
+    cep: '',
+    logradouro: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    uf: ''
   });
 
   const [partners, setPartners] = useState<{ name: string; cpf: string; participation: string }[]>([]);
@@ -47,6 +54,31 @@ const CompanyReg: React.FC<{ user: User }> = ({ user }) => {
     setFetching(false);
   };
 
+  const handleCEPChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = formatCEP(e.target.value);
+    setFormData(prev => ({ ...prev, cep: value }));
+
+    const cleanValue = value.replace(/\D/g, '');
+    if (cleanValue.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cleanValue}/json/`);
+        const data = await response.json();
+        if (!data.erro) {
+          setFormData(prev => ({
+            ...prev,
+            logradouro: data.logradouro || prev.logradouro,
+            complemento: data.complemento || prev.complemento,
+            bairro: data.bairro || prev.bairro,
+            cidade: data.localidade || prev.cidade,
+            uf: data.uf || prev.uf
+          }));
+        }
+      } catch (err) {
+        console.error('Erro ao buscar CEP:', err);
+      }
+    }
+  };
+
   const handleCNPJChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = formatDocument(e.target.value);
     setFormData(prev => ({ ...prev, cnpj: value }));
@@ -70,7 +102,14 @@ const CompanyReg: React.FC<{ user: User }> = ({ user }) => {
           ...prev,
           razaoSocial: data.razao_social || '',
           nomeFantasia: data.nome_fantasia || data.razao_social || '',
-          email: data.email || ''
+          email: data.email || '',
+          cep: data.cep ? (data.cep.includes('-') ? data.cep : formatCEP(data.cep)) : prev.cep,
+          logradouro: data.logradouro || prev.logradouro,
+          numero: data.numero || prev.numero,
+          complemento: data.complemento || prev.complemento,
+          bairro: data.bairro || prev.bairro,
+          cidade: data.municipio || prev.cidade,
+          uf: data.uf || prev.uf
         }));
       } catch (err) {
         setError('Não foi possível buscar os dados do CNPJ');
@@ -94,7 +133,14 @@ const CompanyReg: React.FC<{ user: User }> = ({ user }) => {
       cnpj: formData.cnpj,
       razao_social: formData.razaoSocial,
       name: formData.nomeFantasia,
-      email: formData.email
+      email: formData.email,
+      cep: formData.cep,
+      logradouro: formData.logradouro,
+      numero: formData.numero,
+      complemento: formData.complemento,
+      bairro: formData.bairro,
+      cidade: formData.cidade,
+      uf: formData.uf
     };
 
     let companyId = editingId;
@@ -215,7 +261,14 @@ const CompanyReg: React.FC<{ user: User }> = ({ user }) => {
       cnpj: company.cnpj || '',
       razaoSocial: company.razao_social || '',
       nomeFantasia: company.name || '',
-      email: company.email || ''
+      email: company.email || '',
+      cep: company.cep || '',
+      logradouro: company.logradouro || '',
+      numero: company.numero || '',
+      complemento: company.complemento || '',
+      bairro: company.bairro || '',
+      cidade: company.cidade || '',
+      uf: company.uf || ''
     });
     setEditingId(company.id);
     setShowForm(true);
@@ -257,7 +310,10 @@ const CompanyReg: React.FC<{ user: User }> = ({ user }) => {
   };
 
   const resetForm = () => {
-    setFormData({ cnpj: '', razaoSocial: '', nomeFantasia: '', email: '' });
+    setFormData({
+      cnpj: '', razaoSocial: '', nomeFantasia: '', email: '',
+      cep: '', logradouro: '', numero: '', complemento: '', bairro: '', cidade: '', uf: ''
+    });
     setPartners([]);
     setNewPartner({ name: '', cpf: '', participation: '' });
     setEditingId(null);
@@ -373,6 +429,79 @@ const CompanyReg: React.FC<{ user: User }> = ({ user }) => {
                   type="email"
                   placeholder="contato@empresa.com.br"
                 />
+              </div>
+
+              <div className="md:col-span-12 pt-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPin className="text-primary w-4 h-4" />
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Endereço de Faturamento</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                  <div className="md:col-span-4 space-y-2 relative">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">CEP</label>
+                    <input
+                      value={formData.cep}
+                      onChange={handleCEPChange}
+                      className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
+                      placeholder="00000-000"
+                    />
+                  </div>
+                  <div className="md:col-span-12 space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Complemento</label>
+                    <input
+                      value={formData.complemento}
+                      onChange={(e) => setFormData(prev => ({ ...prev, complemento: e.target.value }))}
+                      className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
+                      placeholder="Apto, Bloco, Sala..."
+                    />
+                  </div>
+                  <div className="md:col-span-9 space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Logradouro</label>
+                    <input
+                      value={formData.logradouro}
+                      onChange={(e) => setFormData(prev => ({ ...prev, logradouro: e.target.value }))}
+                      className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
+                      placeholder="Rua, Av..."
+                    />
+                  </div>
+                  <div className="md:col-span-3 space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Número</label>
+                    <input
+                      value={formData.numero}
+                      onChange={(e) => setFormData(prev => ({ ...prev, numero: e.target.value }))}
+                      className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
+                      placeholder="123"
+                    />
+                  </div>
+                  <div className="md:col-span-5 space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Bairro</label>
+                    <input
+                      value={formData.bairro}
+                      onChange={(e) => setFormData(prev => ({ ...prev, bairro: e.target.value }))}
+                      className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
+                      placeholder="Bairro"
+                    />
+                  </div>
+                  <div className="md:col-span-5 space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cidade</label>
+                    <input
+                      value={formData.cidade}
+                      onChange={(e) => setFormData(prev => ({ ...prev, cidade: e.target.value }))}
+                      className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
+                      placeholder="Cidade"
+                    />
+                  </div>
+                  <div className="md:col-span-2 space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">UF</label>
+                    <input
+                      value={formData.uf}
+                      onChange={(e) => setFormData(prev => ({ ...prev, uf: e.target.value.toUpperCase() }))}
+                      maxLength={2}
+                      className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold text-center"
+                      placeholder="SP"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Partners Section */}

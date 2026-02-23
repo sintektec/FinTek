@@ -54,6 +54,13 @@ export interface Company {
   cnpj: string;
   razao_social: string;
   email: string;
+  cep?: string;
+  logradouro?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  uf?: string;
   created_at?: string;
   partners?: Partner[];
 }
