@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../types';
 import { supabase } from '../lib/supabase';
-import { ShieldAlert, Unlock, ArrowRight } from 'lucide-react';
+import { ShieldAlert, Unlock, ArrowRight, Sparkles, Brain } from 'lucide-react';
+import { generateFinancialInsight } from '../lib/gemini';
 
 interface KPIRecord {
   id: string;
@@ -174,6 +175,8 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
   const [selectedKPI, setSelectedKPI] = useState<KPIModalData | null>(null);
   const [securityAlerts, setSecurityAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [aiInsight, setAiInsight] = useState<string>('');
+  const [aiLoading, setAiLoading] = useState(false);
 
   // Real data state
   const [payables, setPayables] = useState<any[]>([]);
@@ -213,6 +216,29 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
     if (peopleRes.data) setPeople(peopleRes.data);
     if (compRes.data) setCompanies(compRes.data);
     setLoading(false);
+    generateAIAnalysis(payRes.data || [], recRes.data || [], invRes.data || []);
+  };
+
+  const generateAIAnalysis = async (pays: any[], recs: any[], invs: any[]) => {
+    if (aiInsight || aiLoading) return;
+    setAiLoading(true);
+
+    const today = new Date().toISOString().split('T')[0];
+    const totalPay = pays.filter(p => p.status !== 'PAID').reduce((acc, p) => acc + p.amount, 0);
+    const totalRec = recs.filter(r => r.status !== 'RECEIVED').reduce((acc, r) => acc + r.amount, 0);
+    const totalInv = invs.reduce((acc, i) => acc + i.current_value, 0);
+
+    const dataReport = `
+      Relatório de Hoje (${today}):
+      - Contas a Pagar Pendentes: ${formatBRL(totalPay)}
+      - Recebimentos Pendentes: ${formatBRL(totalRec)}
+      - Total Investido: ${formatBRL(totalInv)}
+      - Saldo Previsto: ${formatBRL(totalRec - totalPay)}
+    `;
+
+    const insight = await generateFinancialInsight(dataReport);
+    setAiInsight(insight);
+    setAiLoading(false);
   };
 
   const fetchSecurityAlerts = async () => {
@@ -353,6 +379,37 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
           </div>
         </div>
       )}
+
+      <div className="bg-gradient-to-br from-primary/10 via-background-dark to-primary/5 border border-primary/20 rounded-3xl p-8 relative overflow-hidden group shadow-2xl shadow-primary/5">
+        <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform duration-700">
+          <Brain className="w-32 h-32 text-primary" />
+        </div>
+        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+          <div className="size-16 rounded-2xl bg-primary/20 flex items-center justify-center text-primary shadow-inner">
+            <Sparkles className={`w-8 h-8 ${aiLoading ? 'animate-pulse' : ''}`} />
+          </div>
+          <div className="flex-1 space-y-2 text-center md:text-left">
+            <h3 className="text-primary font-black text-sm uppercase tracking-[0.2em]">FinTek AI Insight</h3>
+            {aiLoading ? (
+              <div className="flex items-center gap-3">
+                <div className="h-4 w-48 bg-slate-200 dark:bg-surface-highlight rounded-full animate-pulse"></div>
+              </div>
+            ) : (
+              <p className="text-slate-900 dark:text-white text-lg font-bold leading-relaxed">
+                {aiInsight || 'Analisando seus dados financeiros para gerar recomendações personalizadas...'}
+              </p>
+            )}
+          </div>
+          {!aiLoading && aiInsight && (
+            <button
+              onClick={() => { setAiInsight(''); generateAIAnalysis(payables, receivables, investments); }}
+              className="px-6 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+            >
+              Recalcular
+            </button>
+          )}
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <DashboardCard

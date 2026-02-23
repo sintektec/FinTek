@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../types';
 import { supabase } from '../lib/supabase';
-import { Search, Download, PlusCircle, Edit3, Trash2, Calendar, Hourglass, AlertCircle, CheckCircle, X } from 'lucide-react';
+import { Search, Download, PlusCircle, Edit3, Trash2, Calendar, Hourglass, AlertCircle, CheckCircle, X, Sparkles } from 'lucide-react';
+import { suggestTransactionDetails } from '../lib/gemini';
 import EditReceivableModal from '../components/EditReceivableModal';
 import ExportReceivableModal from '../components/ExportReceivableModal';
 
@@ -31,6 +32,7 @@ const Receivable: React.FC<{ user: User }> = ({ user }) => {
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isSuggesting, setIsSuggesting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
 
@@ -126,6 +128,28 @@ const Receivable: React.FC<{ user: User }> = ({ user }) => {
       fetchRecords();
     }
     setSaving(false);
+  };
+
+  const handleAISuggest = async () => {
+    if (!description || isSuggesting) return;
+    setIsSuggesting(true);
+
+    const customerNames = customers.map(c => (c as CustomerExtended).trade_name || c.name);
+    const companyNames = companies.map(c => c.name);
+
+    const suggestion = await suggestTransactionDetails(description, customerNames, companyNames);
+
+    if (suggestion) {
+      if (suggestion.supplier) {
+        const foundCust = customers.find(c => ((c as CustomerExtended).trade_name || c.name) === suggestion.supplier);
+        if (foundCust) setCustomerId(foundCust.id);
+      }
+      if (suggestion.company) {
+        const foundComp = companies.find(c => c.name === suggestion.company);
+        if (foundComp) setCompanyId(foundComp.id);
+      }
+    }
+    setIsSuggesting(false);
   };
 
   const calculateOverdueDays = (dueDate: string) => {
@@ -280,13 +304,26 @@ const Receivable: React.FC<{ user: User }> = ({ user }) => {
             <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 items-end">
               <div className="lg:col-span-4 flex flex-col gap-2">
                 <label className="text-slate-900 dark:text-white text-[10px] font-black uppercase tracking-[0.2em]">Descrição</label>
-                <input
-                  required
-                  className="w-full bg-slate-50 dark:bg-surface-darker border border-slate-200 dark:border-surface-highlight rounded-xl h-12 px-4 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary font-bold placeholder-slate-400"
-                  placeholder="Ex: Consultoria Mensal"
-                  value={description}
-                  onChange={e => setDescription(e.target.value)}
-                />
+                <div className="relative group">
+                  <input
+                    required
+                    className="w-full bg-slate-50 dark:bg-surface-darker border border-slate-200 dark:border-surface-highlight rounded-xl h-12 pl-4 pr-12 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary font-bold placeholder-slate-400"
+                    placeholder="Ex: Consultoria Mensal"
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                  />
+                  {description && (
+                    <button
+                      type="button"
+                      onClick={handleAISuggest}
+                      disabled={isSuggesting}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 size-8 flex items-center justify-center rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-all disabled:opacity-50"
+                      title="Sugerir Cliente/Empresa com IA"
+                    >
+                      <Sparkles className={`w-4 h-4 ${isSuggesting ? 'animate-spin' : ''}`} />
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="lg:col-span-4 flex flex-col gap-2">
                 <label className="text-slate-900 dark:text-white text-[10px] font-black uppercase tracking-[0.2em]">Cliente</label>
