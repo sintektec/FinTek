@@ -37,6 +37,8 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
     phone: '',
     cep: '',
     logradouro: '',
+    numero: '',
+    complemento: '',
     bairro: '',
     cidade: '',
     uf: ''
@@ -82,6 +84,8 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
             email: data.email || prev.email,
             cep: data.cep ? formatCEP(data.cep) : prev.cep,
             logradouro: data.logradouro || prev.logradouro,
+            numero: data.numero || prev.numero,
+            complemento: data.complemento || prev.complemento,
             bairro: data.bairro || prev.bairro,
             cidade: data.municipio || prev.cidade,
             uf: data.uf || prev.uf
@@ -111,6 +115,7 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
           setFormData(prev => ({
             ...prev,
             logradouro: data.logradouro || prev.logradouro,
+            complemento: data.complemento || prev.complemento,
             bairro: data.bairro || prev.bairro,
             cidade: data.localidade || prev.cidade,
             uf: data.uf || prev.uf
@@ -151,7 +156,7 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
       setEditingId(null);
       setFormData({
         cnpj_cpf: '', name: '', trade_name: '', email: '', phone: '',
-        cep: '', logradouro: '', bairro: '', cidade: '', uf: ''
+        cep: '', logradouro: '', numero: '', complemento: '', bairro: '', cidade: '', uf: ''
       });
       fetchCustomers();
     }
@@ -196,6 +201,8 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
       phone: customer.phone || '',
       cep: customer.cep || '',
       logradouro: customer.logradouro || '',
+      numero: customer.numero || '',
+      complemento: customer.complemento || '',
       bairro: customer.bairro || '',
       cidade: customer.cidade || '',
       uf: customer.uf || ''
@@ -221,7 +228,7 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
               setEditingId(null);
               setFormData({
                 cnpj_cpf: '', name: '', trade_name: '', email: '', phone: '',
-                cep: '', logradouro: '', bairro: '', cidade: '', uf: ''
+                cep: '', logradouro: '', numero: '', complemento: '', bairro: '', cidade: '', uf: ''
               });
               setShowForm(true);
             }}
@@ -405,13 +412,31 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
                         placeholder="00000-000"
                       />
                     </div>
-                    <div className="md:col-span-8 space-y-2">
+                    <div className="md:col-span-12 space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Complemento</label>
+                      <input
+                        value={formData.complemento}
+                        onChange={(e) => setFormData(prev => ({ ...prev, complemento: e.target.value }))}
+                        className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
+                        placeholder="Apto, Bloco, Sala..."
+                      />
+                    </div>
+                    <div className="md:col-span-9 space-y-2">
                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Logradouro</label>
                       <input
                         value={formData.logradouro}
                         onChange={(e) => setFormData(prev => ({ ...prev, logradouro: e.target.value }))}
                         className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
                         placeholder="Rua, Av..."
+                      />
+                    </div>
+                    <div className="md:col-span-3 space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Número</label>
+                      <input
+                        value={formData.numero}
+                        onChange={(e) => setFormData(prev => ({ ...prev, numero: e.target.value }))}
+                        className="h-12 w-full rounded-xl border border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-darker px-4 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary font-bold transition-all"
+                        placeholder="123"
                       />
                     </div>
                     <div className="md:col-span-5 space-y-2">
