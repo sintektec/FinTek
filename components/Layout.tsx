@@ -80,7 +80,7 @@ const Layout: React.FC<{ children: React.ReactNode, user: User, onLogout: () => 
   const [showNotifications, setShowNotifications] = useState(false);
 
   // State for sidebar groups
-  const [openGroups, setOpenGroups] = useState<string[]>(['Financeiro', 'Cadastros']);
+  const [openGroups, setOpenGroups] = useState<string[]>([]);
 
   const toggleGroup = (group: string) => {
     setOpenGroups(prev => prev.includes(group) ? prev.filter(g => g !== group) : [...prev, group]);

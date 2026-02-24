@@ -380,6 +380,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
         </div>
       )}
 
+      {/* FinTek AI Insight - Oculto a pedido do usuário 
       <div className="bg-gradient-to-br from-primary/10 via-background-dark to-primary/5 border border-primary/20 rounded-3xl p-8 relative overflow-hidden group shadow-2xl shadow-primary/5">
         <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform duration-700">
           <Brain className="w-32 h-32 text-primary" />
@@ -410,6 +411,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
           )}
         </div>
       </div>
+      */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <DashboardCard
