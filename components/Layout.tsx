@@ -10,24 +10,65 @@ interface SidebarItemProps {
   isActive: boolean;
   isAdminOnly?: boolean;
   userRole?: string;
+  isSubitem?: boolean;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon, label, isActive, isAdminOnly, userRole }) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon, label, isActive, isAdminOnly, userRole, isSubitem }) => {
   if (isAdminOnly && userRole !== 'MASTER_ADMIN') return null;
 
   return (
     <Link
       to={to}
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-        ? 'bg-primary/10 border border-primary/20 text-slate-900 dark:text-white shadow-lg'
+      className={`flex items-center gap-3 ${isSubitem ? 'px-3 py-2.5 rounded-lg' : 'px-4 py-3 rounded-xl'} transition-all duration-200 ${isActive
+        ? 'bg-primary/10 border border-primary/20 text-slate-900 dark:text-white shadow-sm'
         : 'text-slate-600 dark:text-text-secondary hover:bg-slate-100 dark:hover:bg-surface-highlight hover:text-slate-900 dark:hover:text-white'
         }`}
     >
-      <span className={`material-symbols-outlined ${isActive ? 'text-primary' : 'text-slate-400 dark:text-text-secondary'}`}>
+      <span className={`material-symbols-outlined ${isSubitem ? 'text-[20px]' : ''} ${isActive ? 'text-primary' : 'text-slate-400 dark:text-text-secondary'}`}>
         {icon}
       </span>
-      <span className="text-sm font-bold">{label}</span>
+      <span className={`${isSubitem ? 'text-sm font-semibold' : 'text-sm font-bold'}`}>{label}</span>
     </Link>
+  );
+};
+
+const SidebarGroup: React.FC<{
+  icon: string;
+  label: string;
+  isActive: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
+  isAdminOnly?: boolean;
+  userRole?: string;
+  children: React.ReactNode;
+}> = ({ icon, label, isActive, isOpen, onToggle, isAdminOnly, userRole, children }) => {
+  if (isAdminOnly && userRole !== 'MASTER_ADMIN') return null;
+
+  return (
+    <div className="flex flex-col gap-1 w-full">
+      <button
+        onClick={onToggle}
+        className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 w-full ${isActive
+          ? 'bg-primary/5 text-primary'
+          : 'text-slate-600 dark:text-text-secondary hover:bg-slate-100 dark:hover:bg-surface-highlight hover:text-slate-900 dark:hover:text-white'
+          }`}
+      >
+        <div className="flex items-center gap-3">
+          <span className={`material-symbols-outlined ${isActive ? 'text-primary' : 'text-slate-400 dark:text-text-secondary'}`}>
+            {icon}
+          </span>
+          <span className="text-sm font-bold">{label}</span>
+        </div>
+        <span className={`material-symbols-outlined text-sm transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+          expand_more
+        </span>
+      </button>
+      <div className={`flex flex-col gap-1 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+        <div className="flex flex-col gap-1 pl-3 ml-4 border-l-2 border-slate-100 dark:border-surface-highlight/50 py-1">
+          {children}
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -37,6 +78,13 @@ const Layout: React.FC<{ children: React.ReactNode, user: User, onLogout: () => 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  // State for sidebar groups
+  const [openGroups, setOpenGroups] = useState<string[]>(['Financeiro', 'Cadastros']);
+
+  const toggleGroup = (group: string) => {
+    setOpenGroups(prev => prev.includes(group) ? prev.filter(g => g !== group) : [...prev, group]);
+  };
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -69,49 +117,62 @@ const Layout: React.FC<{ children: React.ReactNode, user: User, onLogout: () => 
             </div>
           </div>
 
-          <div className="flex flex-col gap-1 flex-1 overflow-y-auto pr-2 scrollbar-hide">
+          <div className="flex flex-col gap-1 flex-1 overflow-y-auto pr-2 scrollbar-hide pb-4">
             <SidebarItem to="/" icon="dashboard" label="Visão Geral" isActive={isActive('/')} />
             <SidebarItem to="/agendamentos" icon="event_note" label="Agendamentos" isActive={isActive('/agendamentos')} />
 
-            <div className="px-4 py-3 mt-4">
-              <p className="text-[10px] font-black text-slate-400 dark:text-text-secondary uppercase tracking-[0.2em]">Operacional</p>
+            <div className="mt-4 flex flex-col gap-2">
+              <SidebarGroup
+                icon="account_balance_wallet"
+                label="Financeiro"
+                isActive={isActive('/pagar') || isActive('/receber') || isActive('/investimentos')}
+                isOpen={openGroups.includes('Financeiro')}
+                onToggle={() => toggleGroup('Financeiro')}
+              >
+                <SidebarItem isSubitem to="/pagar" icon="payments" label="Contas a Pagar" isActive={isActive('/pagar')} />
+                <SidebarItem isSubitem to="/receber" icon="account_balance_wallet" label="Contas a Receber" isActive={isActive('/receber')} />
+                <SidebarItem isSubitem to="/investimentos" icon="trending_up" label="Investimentos / Saldos" isActive={isActive('/investimentos')} />
+              </SidebarGroup>
+
+              {user.role !== 'USER' && (
+                <SidebarGroup
+                  icon="app_registration"
+                  label="Cadastros"
+                  isActive={location.pathname.startsWith('/cadastros') && !isActive('/cadastros/audit')}
+                  isOpen={openGroups.includes('Cadastros')}
+                  onToggle={() => toggleGroup('Cadastros')}
+                >
+                  <SidebarItem isSubitem to="/cadastros/empresa" icon="domain" label="Empresas" isActive={isActive('/cadastros/empresa')} />
+                  <SidebarItem isSubitem to="/cadastros/cliente" icon="group" label="Clientes" isActive={isActive('/cadastros/cliente')} />
+                  <SidebarItem isSubitem to="/cadastros/pessoa" icon="person" label="Pessoas" isActive={isActive('/cadastros/pessoa')} />
+                  <SidebarItem isSubitem to="/cadastros/banco" icon="account_balance" label="Bancos" isActive={isActive('/cadastros/banco')} />
+                  <SidebarItem isSubitem to="/cadastros/fornecedor" icon="local_shipping" label="Fornecedores" isActive={isActive('/cadastros/fornecedor')} />
+                  <SidebarItem isSubitem to="/cadastros/usuarios" icon="admin_panel_settings" label="Usuários" isActive={isActive('/cadastros/usuarios')} />
+                </SidebarGroup>
+              )}
+
+              <SidebarGroup
+                icon="support_agent"
+                label="CRM"
+                isActive={isActive('/crm')}
+                isOpen={openGroups.includes('CRM')}
+                onToggle={() => toggleGroup('CRM')}
+              >
+                <SidebarItem isSubitem to="/crm" icon="handshake" label="Em breve..." isActive={isActive('/crm')} />
+              </SidebarGroup>
+
+              {user.role === 'MASTER_ADMIN' && (
+                <SidebarGroup
+                  icon="memory"
+                  label="Sistema"
+                  isActive={isActive('/cadastros/audit')}
+                  isOpen={openGroups.includes('Sistema')}
+                  onToggle={() => toggleGroup('Sistema')}
+                >
+                  <SidebarItem isSubitem to="/cadastros/audit" icon="history" label="Log do Sistema" isActive={isActive('/cadastros/audit')} />
+                </SidebarGroup>
+              )}
             </div>
-            <SidebarItem to="/pagar" icon="payments" label="A Pagar" isActive={isActive('/pagar')} />
-            <SidebarItem to="/receber" icon="account_balance_wallet" label="A Receber" isActive={isActive('/receber')} />
-            <SidebarItem to="/investimentos" icon="trending_up" label="Investimentos/Saldo bancário" isActive={isActive('/investimentos')} />
-
-            {(user.role === 'MASTER_ADMIN' || user.role === 'ADMIN') && (
-              <>
-                <div className="px-4 py-3 mt-4">
-                  <p className="text-[10px] font-black text-slate-400 dark:text-text-secondary uppercase tracking-[0.2em]">Configurações</p>
-                </div>
-                <SidebarItem to="/cadastros/empresa" icon="domain" label="Empresas" isActive={isActive('/cadastros/empresa')} />
-                <SidebarItem to="/cadastros/cliente" icon="group" label="Clientes" isActive={isActive('/cadastros/cliente')} />
-                <SidebarItem to="/cadastros/pessoa" icon="person" label="Pessoas" isActive={isActive('/cadastros/pessoa')} />
-                <SidebarItem to="/cadastros/banco" icon="account_balance" label="Bancos" isActive={isActive('/cadastros/banco')} />
-                <SidebarItem to="/cadastros/fornecedor" icon="local_shipping" label="Fornecedores" isActive={isActive('/cadastros/fornecedor')} />
-              </>
-            )}
-
-            {(user.role === 'MASTER_ADMIN' || user.role === 'ADMIN') && (
-              <SidebarItem
-                to="/cadastros/usuarios"
-                icon="admin_panel_settings"
-                label="Usuários"
-                isActive={isActive('/cadastros/usuarios')}
-                userRole={user.role}
-              />
-            )}
-
-            {user.role === 'MASTER_ADMIN' && (
-              <SidebarItem
-                to="/cadastros/audit"
-                icon="history"
-                label="Logs do Sistema"
-                isActive={isActive('/cadastros/audit')}
-                userRole={user.role}
-              />
-            )}
           </div>
 
           <div className="mt-auto pt-4 border-t border-slate-200 dark:border-surface-highlight">
