@@ -16,6 +16,7 @@ import SupplierReg from './screens/Cadastros/SupplierReg';
 import CustomerReg from './screens/Cadastros/CustomerReg';
 import UserReg from './screens/Cadastros/UserReg';
 import AuditLog from './screens/Cadastros/AuditLog';
+import KanbanBoard from './screens/CRM/KanbanBoard';
 import { User, UserRole } from './types';
 import { supabase } from './lib/supabase';
 
@@ -109,6 +110,8 @@ const App: React.FC = () => {
           {currentUser.role === 'MASTER_ADMIN' && (
             <Route path="/cadastros/audit" element={<AuditLog user={currentUser} />} />
           )}
+
+          <Route path="/crm" element={<KanbanBoard />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

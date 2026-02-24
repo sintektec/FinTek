@@ -158,7 +158,7 @@ const Layout: React.FC<{ children: React.ReactNode, user: User, onLogout: () => 
                 isOpen={openGroups.includes('CRM')}
                 onToggle={() => toggleGroup('CRM')}
               >
-                <SidebarItem isSubitem to="/crm" icon="handshake" label="Em breve..." isActive={isActive('/crm')} />
+                <SidebarItem isSubitem to="/crm" icon="view_kanban" label="Pipeline" isActive={isActive('/crm')} />
               </SidebarGroup>
 
               {user.role === 'MASTER_ADMIN' && (

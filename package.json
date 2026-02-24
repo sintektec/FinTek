@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@hello-pangea/dnd": "^18.0.1",
     "@supabase/supabase-js": "^2.89.0",
     "date-fns": "^4.1.0",
     "dotenv": "^17.3.1",
