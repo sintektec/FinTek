@@ -119,16 +119,16 @@ const Layout: React.FC<{ children: React.ReactNode, user: User, onLogout: () => 
 
           <div className="flex flex-col gap-1 flex-1 overflow-y-auto pr-2 scrollbar-hide pb-4">
             <SidebarItem to="/" icon="dashboard" label="Visão Geral" isActive={isActive('/')} />
-            <SidebarItem to="/agendamentos" icon="event_note" label="Agendamentos" isActive={isActive('/agendamentos')} />
 
             <div className="mt-4 flex flex-col gap-2">
               <SidebarGroup
                 icon="account_balance_wallet"
                 label="Financeiro"
-                isActive={isActive('/pagar') || isActive('/receber') || isActive('/investimentos')}
+                isActive={isActive('/pagar') || isActive('/receber') || isActive('/investimentos') || isActive('/agendamentos')}
                 isOpen={openGroups.includes('Financeiro')}
                 onToggle={() => toggleGroup('Financeiro')}
               >
+                <SidebarItem isSubitem to="/agendamentos" icon="event_note" label="Agendamentos" isActive={isActive('/agendamentos')} />
                 <SidebarItem isSubitem to="/pagar" icon="payments" label="Contas a Pagar" isActive={isActive('/pagar')} />
                 <SidebarItem isSubitem to="/receber" icon="account_balance_wallet" label="Contas a Receber" isActive={isActive('/receber')} />
                 <SidebarItem isSubitem to="/investimentos" icon="trending_up" label="Investimentos / Saldos" isActive={isActive('/investimentos')} />
