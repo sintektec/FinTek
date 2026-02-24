@@ -129,7 +129,7 @@ const CompanyReg: React.FC<{ user: User }> = ({ user }) => {
     e.preventDefault();
     setSaving(true);
 
-    const payload = {
+    const payload: any = {
       cnpj: formData.cnpj,
       razao_social: formData.razaoSocial,
       name: formData.nomeFantasia,
@@ -142,6 +142,9 @@ const CompanyReg: React.FC<{ user: User }> = ({ user }) => {
       cidade: formData.cidade,
       uf: formData.uf
     };
+
+    if (payload.numero === '') delete payload.numero;
+    if (payload.complemento === '') delete payload.complemento;
 
     let companyId = editingId;
     let result;

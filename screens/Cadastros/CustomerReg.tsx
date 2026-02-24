@@ -132,10 +132,14 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
     if (error) return;
     setSaving(true);
 
-    const payload = {
+    const payload: any = {
       ...formData,
       is_active: true
     };
+
+    // Evita erro de schema caso colunas ainda não existam no banco e campo esteja vazio
+    if (payload.numero === '') delete payload.numero;
+    if (payload.complemento === '') delete payload.complemento;
 
     let result;
     if (editingId) {

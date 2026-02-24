@@ -104,10 +104,13 @@ const PeopleReg: React.FC<{ user: User }> = ({ user }) => {
     if (error) return;
     setSaving(true);
 
-    const payload = {
+    const payload: any = {
       ...formData,
       is_active: true
     };
+
+    if (payload.numero === '') delete payload.numero;
+    if (payload.complemento === '') delete payload.complemento;
 
     let result;
     if (editingId) {
@@ -166,6 +169,9 @@ const PeopleReg: React.FC<{ user: User }> = ({ user }) => {
   const openEdit = (person: any) => {
     setEditingId(person.id);
     setFormData({
+      name: person.name || '',
+      nickname: person.nickname || '',
+      cpf: person.cpf || '',
       email: person.email || '',
       phone: person.phone || '',
       birth_date: person.birth_date || '',

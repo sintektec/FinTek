@@ -129,7 +129,7 @@ const SupplierReg: React.FC<{ user: User }> = ({ user }) => {
     if (error) return;
     setSaving(true);
 
-    const payload = {
+    const payload: any = {
       name: formData.name,
       trade_name: formData.trade_name,
       cnpj_cpf: formData.cnpj_cpf,
@@ -144,6 +144,9 @@ const SupplierReg: React.FC<{ user: User }> = ({ user }) => {
       uf: formData.uf,
       is_active: true
     };
+
+    if (payload.numero === '') delete payload.numero;
+    if (payload.complemento === '') delete payload.complemento;
 
     let result;
     if (editingId) {
@@ -202,6 +205,9 @@ const SupplierReg: React.FC<{ user: User }> = ({ user }) => {
   const openEdit = (supplier: any) => {
     setEditingId(supplier.id);
     setFormData({
+      cnpj_cpf: supplier.cnpj_cpf || '',
+      name: supplier.name || '',
+      trade_name: supplier.trade_name || '',
       email: supplier.email || '',
       phone: supplier.phone || '',
       cep: supplier.cep || '',
