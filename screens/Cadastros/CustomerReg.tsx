@@ -67,6 +67,20 @@ const CustomerReg: React.FC<{ user: User }> = ({ user }) => {
     setError('');
 
     const cleanValue = value.replace(/\D/g, '');
+
+    if (cleanValue.length === 11 || cleanValue.length === 14) {
+      let query = supabase.from('customers').select('id').eq('cnpj_cpf', value);
+      if (editingId) {
+        query = query.neq('id', editingId);
+      }
+      const { data: existing, error: qError } = await query.maybeSingle();
+
+      if (existing) {
+        setError('Documento já está cadastrado');
+        return;
+      }
+    }
+
     if (cleanValue.length === 14) {
       if (!validateCNPJ(cleanValue)) {
         setError('CNPJ Inválido');

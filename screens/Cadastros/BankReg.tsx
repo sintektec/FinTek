@@ -27,6 +27,7 @@ const BankReg: React.FC<{ user: User }> = ({ user }) => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState<'ALL' | 'PF' | 'PJ'>('ALL');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -181,10 +182,21 @@ const BankReg: React.FC<{ user: User }> = ({ user }) => {
     }
   };
 
-  const filteredBanks = banks.filter(b =>
-    b.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    getTypeText(b.account_type).toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredBanks = banks.filter(b => {
+    const matchesSearch = b.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getTypeText(b.account_type).toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (!matchesSearch) return false;
+
+    if (filterType === 'PF') {
+      return b.owner_document && b.owner_document.replace(/\D/g, '').length === 11;
+    }
+    if (filterType === 'PJ') {
+      return b.owner_document && b.owner_document.replace(/\D/g, '').length === 14;
+    }
+
+    return true;
+  });
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto space-y-10">
@@ -208,15 +220,38 @@ const BankReg: React.FC<{ user: User }> = ({ user }) => {
         )}
       </div>
 
-      <div className="relative group max-w-md">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors" />
-        <input
-          type="text"
-          placeholder="Buscar por nome ou tipo..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full h-12 pl-12 pr-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight rounded-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm"
-        />
+      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div className="relative group w-full md:max-w-md">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+          <input
+            type="text"
+            placeholder="Buscar por nome ou tipo..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-12 pl-12 pr-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight rounded-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setFilterType('ALL')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${filterType === 'ALL' ? 'bg-primary text-white shadow-md' : 'bg-slate-100 dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-surface-highlight'}`}
+          >
+            Todos
+          </button>
+          <button
+            onClick={() => setFilterType('PF')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${filterType === 'PF' ? 'bg-primary text-white shadow-md' : 'bg-slate-100 dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-surface-highlight'}`}
+          >
+            Pessoa Física
+          </button>
+          <button
+            onClick={() => setFilterType('PJ')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${filterType === 'PJ' ? 'bg-primary text-white shadow-md' : 'bg-slate-100 dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-surface-highlight'}`}
+          >
+            Pessoa Jurídica
+          </button>
+        </div>
       </div>
 
       <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-surface-highlight rounded-3xl overflow-hidden shadow-sm">
