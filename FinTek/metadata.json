@@ -1,8 +1,0 @@
-{
-  "name": "FinTek - Gestão financeira",
-  "description": "A comprehensive financial dashboard with modules for accounts payable, receivable, investments, scheduling, and entity management, featuring a sleek dark theme.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
-}
