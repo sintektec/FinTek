@@ -17,6 +17,7 @@ import CustomerReg from './screens/Cadastros/CustomerReg';
 import UserReg from './screens/Cadastros/UserReg';
 import AuditLog from './screens/Cadastros/AuditLog';
 import KanbanBoard from './screens/CRM/KanbanBoard';
+import CRMDashboard from './screens/CRM/CRMDashboard';
 import ContractDashboard from './screens/Contratos/ContractDashboard';
 import ContractList from './screens/Contratos/ContractList';
 import ContractForm from './screens/Contratos/ContractForm';
@@ -116,6 +117,7 @@ const App: React.FC = () => {
           )}
 
           <Route path="/crm" element={<KanbanBoard />} />
+          <Route path="/crm/dashboard" element={<CRMDashboard />} />
 
           {/* Contratos */}
           <Route path="/contratos" element={<ContractDashboard user={currentUser} />} />

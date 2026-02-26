@@ -154,10 +154,11 @@ const Layout: React.FC<{ children: React.ReactNode, user: User, onLogout: () => 
               <SidebarGroup
                 icon="support_agent"
                 label="CRM"
-                isActive={isActive('/crm')}
+                isActive={location.pathname.startsWith('/crm')}
                 isOpen={openGroups.includes('CRM')}
                 onToggle={() => toggleGroup('CRM')}
               >
+                <SidebarItem isSubitem to="/crm/dashboard" icon="analytics" label="Dashboard" isActive={isActive('/crm/dashboard')} />
                 <SidebarItem isSubitem to="/crm" icon="view_kanban" label="Pipeline" isActive={isActive('/crm')} />
               </SidebarGroup>
 

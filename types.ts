@@ -139,3 +139,28 @@ export interface ContractAlert {
   status: 'pending' | 'triggered' | 'dismissed';
   created_at: string;
 }
+
+// ===== CRM =====
+
+export type DealWorkflowStatus = 'pending' | 'approved' | 'rejected' | 'proposal_sent';
+
+export interface CRMDeal {
+  id: string;
+  title: string;
+  description?: string | null;
+  value: number;
+  stage_id: string;
+  expected_close_date?: string | null;
+  company_id?: string | null;
+  customer_id?: string | null;
+  user_id?: string | null;
+  workflow_status: DealWorkflowStatus;
+  justification?: string | null;
+  proposal_url?: string | null;
+  created_at: string;
+  updated_at: string;
+  // joins
+  company?: { name: string } | null;
+  customer?: { name: string } | null;
+  stage?: { name: string; color: string } | null;
+}

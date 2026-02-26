@@ -19,6 +19,7 @@ interface Deal {
     expected_close_date: string;
     company?: { name: string } | null;
     customer?: { name: string } | null;
+    workflow_status?: 'pending' | 'approved' | 'rejected' | 'proposal_sent';
 }
 
 const KanbanBoard = () => {
@@ -171,9 +172,23 @@ const KanbanBoard = () => {
                                                                         <h4 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2 leading-tight">
                                                                             {deal.title}
                                                                         </h4>
-                                                                        <button className="text-slate-400 hover:text-slate-600 dark:hover:text-white opacity-0 group-hover:opacity-100">
-                                                                            <MoreVertical className="w-4 h-4" />
-                                                                        </button>
+                                                                        <div className="flex flex-col items-end gap-1">
+                                                                            <button
+                                                                                title="Ações do negócio"
+                                                                                className="text-slate-400 hover:text-slate-600 dark:hover:text-white opacity-0 group-hover:opacity-100"
+                                                                            >
+                                                                                <MoreVertical className="w-4 h-4" />
+                                                                            </button>
+                                                                            {deal.workflow_status === 'rejected' && (
+                                                                                <span className="bg-danger/10 text-danger text-[10px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter">REPROVADO</span>
+                                                                            )}
+                                                                            {deal.workflow_status === 'approved' && (
+                                                                                <span className="bg-emerald-500/10 text-emerald-600 text-[10px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter">APROVADO</span>
+                                                                            )}
+                                                                            {deal.workflow_status === 'proposal_sent' && (
+                                                                                <span className="bg-blue-500/10 text-blue-600 text-[10px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter">ENVIADA</span>
+                                                                            )}
+                                                                        </div>
                                                                     </div>
 
                                                                     <div className="font-black text-primary mb-3">

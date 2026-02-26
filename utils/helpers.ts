@@ -92,3 +92,18 @@ export const formatDocument = (doc: string) => {
     .replace(/(\d{4})(\d)/, '$1-$2')
     .substring(0, 18);
 };
+
+export const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(value);
+};
+
+export const daysUntil = (dateStr: string) => {
+  const target = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffTime = target.getTime() - today.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
