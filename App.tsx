@@ -17,6 +17,10 @@ import CustomerReg from './screens/Cadastros/CustomerReg';
 import UserReg from './screens/Cadastros/UserReg';
 import AuditLog from './screens/Cadastros/AuditLog';
 import KanbanBoard from './screens/CRM/KanbanBoard';
+import ContractDashboard from './screens/Contratos/ContractDashboard';
+import ContractList from './screens/Contratos/ContractList';
+import ContractForm from './screens/Contratos/ContractForm';
+import ContractDetail from './screens/Contratos/ContractDetail';
 import { User, UserRole } from './types';
 import { supabase } from './lib/supabase';
 
@@ -112,6 +116,13 @@ const App: React.FC = () => {
           )}
 
           <Route path="/crm" element={<KanbanBoard />} />
+
+          {/* Contratos */}
+          <Route path="/contratos" element={<ContractDashboard user={currentUser} />} />
+          <Route path="/contratos/lista" element={<ContractList user={currentUser} />} />
+          <Route path="/contratos/novo" element={<ContractForm user={currentUser} />} />
+          <Route path="/contratos/editar/:id" element={<ContractForm user={currentUser} />} />
+          <Route path="/contratos/:id" element={<ContractDetail user={currentUser} />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

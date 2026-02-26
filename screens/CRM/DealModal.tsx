@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { X, Building2, User2, AlignLeft, CalendarDays, DollarSign } from 'lucide-react';
+import { X, Building2, User2, AlignLeft, CalendarDays, DollarSign, FileText } from 'lucide-react';
 
 interface Stage {
     id: string;
@@ -137,6 +137,7 @@ const DealModal: React.FC<DealModalProps> = ({ isOpen, onClose, onSave, dealId, 
                         {dealId ? 'Editar Negócio' : 'Novo Negócio'}
                     </h2>
                     <button
+                        title="Fechar modal"
                         onClick={onClose}
                         className="p-2 hover:bg-slate-200 dark:hover:bg-surface-highlight rounded-full transition-colors text-slate-500"
                     >
@@ -184,6 +185,7 @@ const DealModal: React.FC<DealModalProps> = ({ isOpen, onClose, onSave, dealId, 
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Estágio no Funil *</label>
                                 <select
+                                    title="Selecionar estágio"
                                     required
                                     value={formData.stage_id}
                                     onChange={e => setFormData({ ...formData, stage_id: e.target.value })}
@@ -199,6 +201,7 @@ const DealModal: React.FC<DealModalProps> = ({ isOpen, onClose, onSave, dealId, 
                                     <CalendarDays className="w-4 h-4 text-slate-400" /> Fechamento Previsto
                                 </label>
                                 <input
+                                    title="Data de fechamento prevista"
                                     type="date"
                                     value={formData.expected_close_date}
                                     onChange={e => setFormData({ ...formData, expected_close_date: e.target.value })}
@@ -214,6 +217,7 @@ const DealModal: React.FC<DealModalProps> = ({ isOpen, onClose, onSave, dealId, 
                                     <Building2 className="w-4 h-4 text-slate-400" /> Empresa (B2B)
                                 </label>
                                 <select
+                                    title="Selecionar empresa"
                                     value={formData.company_id}
                                     onChange={e => setFormData({ ...formData, company_id: e.target.value, customer_id: '' })} // Limpa cliente se escolher empresa
                                     className="w-full px-4 py-2 bg-white dark:bg-surface-highlight border border-slate-300 dark:border-surface-highlight/50 rounded-xl focus:ring-2 focus:ring-primary focus:outline-none dark:text-white"
@@ -229,6 +233,7 @@ const DealModal: React.FC<DealModalProps> = ({ isOpen, onClose, onSave, dealId, 
                                     <User2 className="w-4 h-4 text-slate-400" /> Cliente / Contato (B2C)
                                 </label>
                                 <select
+                                    title="Selecionar cliente"
                                     value={formData.customer_id}
                                     onChange={e => setFormData({ ...formData, customer_id: e.target.value, company_id: '' })} // Limpa empresa se escolher cliente
                                     className="w-full px-4 py-2 bg-white dark:bg-surface-highlight border border-slate-300 dark:border-surface-highlight/50 rounded-xl focus:ring-2 focus:ring-primary focus:outline-none dark:text-white"
@@ -260,6 +265,15 @@ const DealModal: React.FC<DealModalProps> = ({ isOpen, onClose, onSave, dealId, 
 
                 {/* Footer */}
                 <div className="px-6 py-4 border-t border-slate-200 dark:border-surface-highlight bg-slate-50 dark:bg-surface-dark flex justify-end gap-3 shrink-0">
+                    {dealId && (
+                        <button
+                            type="button"
+                            onClick={() => window.location.href = `#/contratos/novo?deal=${dealId}`}
+                            className="mr-auto px-5 py-2.5 rounded-xl font-bold text-primary hover:bg-primary/10 transition-colors flex items-center gap-2"
+                        >
+                            <FileText className="w-5 h-5" /> Gerar Contrato
+                        </button>
+                    )}
                     <button
                         type="button"
                         onClick={onClose}

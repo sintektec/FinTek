@@ -64,3 +64,78 @@ export interface Company {
   created_at?: string;
   partners?: Partner[];
 }
+
+// ===== CONTRATOS =====
+
+export type ContractType = 'service' | 'license' | 'nda' | 'partnership' | 'purchase' | 'other';
+export type ContractStatus = 'draft' | 'review' | 'approved' | 'signed' | 'active' | 'expired' | 'terminated' | 'archived';
+export type SignatoryRole = 'signer' | 'approver' | 'witness';
+export type SignatoryStatus = 'pending' | 'signed' | 'declined';
+export type AlertType = 'expiration' | 'renewal' | 'custom';
+
+export interface Contract {
+  id: string;
+  contract_number: string;
+  title: string;
+  type: ContractType;
+  status: ContractStatus;
+  crm_deal_id?: string | null;
+  company_id?: string | null;
+  customer_id?: string | null;
+  supplier_id?: string | null;
+  party_name?: string | null;
+  party_doc?: string | null;
+  value: number;
+  currency: string;
+  effective_date?: string | null;
+  expiration_date?: string | null;
+  auto_renew: boolean;
+  renewal_months: number;
+  content?: string | null;
+  notes?: string | null;
+  owner_id?: string | null;
+  created_at: string;
+  updated_at: string;
+  // joins
+  company?: { id: string; name: string } | null;
+  customer?: { id: string; name: string } | null;
+  supplier?: { id: string; name: string } | null;
+  crm_deal?: { id: string; title: string } | null;
+  signatories?: ContractSignatory[];
+  activities?: ContractActivity[];
+  alerts?: ContractAlert[];
+}
+
+export interface ContractSignatory {
+  id: string;
+  contract_id: string;
+  name: string;
+  email: string;
+  role: SignatoryRole;
+  signing_order: number;
+  status: SignatoryStatus;
+  signed_at?: string | null;
+  created_at: string;
+}
+
+export interface ContractActivity {
+  id: string;
+  contract_id: string;
+  user_id?: string | null;
+  action: string;
+  description?: string | null;
+  metadata?: Record<string, any> | null;
+  created_at: string;
+}
+
+export interface ContractAlert {
+  id: string;
+  contract_id: string;
+  type: AlertType;
+  title: string;
+  message?: string | null;
+  trigger_date: string;
+  triggered_at?: string | null;
+  status: 'pending' | 'triggered' | 'dismissed';
+  created_at: string;
+}

@@ -161,6 +161,17 @@ const Layout: React.FC<{ children: React.ReactNode, user: User, onLogout: () => 
                 <SidebarItem isSubitem to="/crm" icon="view_kanban" label="Pipeline" isActive={isActive('/crm')} />
               </SidebarGroup>
 
+              <SidebarGroup
+                icon="description"
+                label="Contratos"
+                isActive={location.pathname.startsWith('/contratos')}
+                isOpen={openGroups.includes('Contratos')}
+                onToggle={() => toggleGroup('Contratos')}
+              >
+                <SidebarItem isSubitem to="/contratos" icon="analytics" label="Dashboard" isActive={isActive('/contratos')} />
+                <SidebarItem isSubitem to="/contratos/lista" icon="list_alt" label="Todos Contratos" isActive={isActive('/contratos/lista')} />
+              </SidebarGroup>
+
               {user.role === 'MASTER_ADMIN' && (
                 <SidebarGroup
                   icon="memory"
